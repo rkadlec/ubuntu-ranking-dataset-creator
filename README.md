@@ -64,7 +64,7 @@ Maps the original dialogue files to the training, validation, and test sets.
 Contains the training set. It is separated into 3 columns: the context of the conversation, the candidate response or 'utterance', and a flag or 'label' (= 0 or 1) denoting 
 whether the response is a 'true response' to the context (flag = 1), or a randomly drawn response from elsewhere in the dataset (flag = 0). This
 triples format is described in the paper. When generated with the default settings, train.csv is 463Mb, with 898,143 lines (ie. examples, which corresponds to 449,071 dialogues)
-and with a vocabulary size of 1,344,621. Note that, to generate the full dataset, use the --examples argument for the create_ubuntu_dataset.py file.
+and with a vocabulary size of 1,344,621. Note that, to generate the full dataset, you should use the --examples argument for the create_ubuntu_dataset.py file.
 
 ###valid.csv:
 Contains the validation set. Each row represents a question. Separated into 11 columns: the context, the true response or 'ground truth utterance', and 9 false responses or
