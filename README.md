@@ -4,22 +4,11 @@ We describe the files for generating the Ubuntu Dialogue Corpus, and the dataset
 
 ##UPDATES FROM UBUNTU CORPUS v1.0:
 
-There are several updates and bug fixes that are present in v2.0. The updates are significant enough that results on the two datasets will
-not be equivalent, and should not be compared. However, models that do well on the first dataset should transfer to the second dataset (with
-perhaps a new hyperparameter search).
+There are several updates and bug fixes that are present in v2.0. The updates are significant enough that results on the two datasets will not be equivalent, and should not be compared. However, models that do well on the first dataset should transfer to the second dataset (with perhaps a new hyperparameter search).
 
--Separated the train/validation/test sets by time. The training set goes from the beginning (2004) to about April 27, 2012, the 
-validation set goes from April 27 to August 7, 2012, and the test set goes from August 7 to December 1, 2012. This more closely mimics
-real life implementation, where you are training a model on past data to predict future data.
-
--Changed the sampling procedure for the context length in the validation and test sets, from an inverse distribution to a uniform distribution 
-(between 2 and the max context size). This increases the average context length, which we consider desirable since we would like to
-model long-term dependencies.
-
--Fixed a bug that caused the distribution of false responses in the test and validation sets to be different from the true responses.
-In particular, the number of words in the false responses was shorter on average than for the true responses, which could have been
-exploited by some models.
-
+- Separated the train/validation/test sets by time. The training set goes from the beginning (2004) to about April 27, 2012, the validation set goes from April 27 to August 7, 2012, and the test set goes from August 7 to December 1, 2012. This more closely mimics real life implementation, where you are training a model on past data to predict future data.
+- Changed the sampling procedure for the context length in the validation and test sets, from an inverse distribution to a uniform distribution (between 2 and the max context size). This increases the average context length, which we consider desirable since we would like to model long-term dependencies.
+- Fixed a bug that caused the distribution of false responses in the test and validation sets to be different from the true responses. In particular, the number of words in the false responses was shorter on average than for the true responses, which could have been exploited by some models.
 
 ##UBUNTU CORPUS GENERATION FILES:
 
@@ -28,7 +17,6 @@ exploited by some models.
 Script that calls create_ubuntu_dataset.py 
 This is the script you should run to download the dataset
 
-
 ###create_ubuntu_dataset.py:
 ####DESCRIPTION:
 Script for generation of train, test and valid datasets from Ubuntu Corpus 1 on 1 dialogs.
@@ -36,21 +24,21 @@ The script downloads 1on1 dialogs from internet and then it randomly samples all
 Copyright IBM 2015
 
 ####ARGUMENTS:
---data_root: directory where 1on1 dialogs will downloaded and extracted, the data will be downloaded from cs.mcgill.ca/~jpineau/datasets/ubuntu-corpus-1.0/ubuntu_dialogs.tgz (default = '.')
---seed: seed for random number generator (default = 1234)
--o, --output: output file for writing to csv (default = None)
+- `--data_root`: directory where 1on1 dialogs will downloaded and extracted, the data will be downloaded from cs.mcgill.ca/~jpineau/datasets/ubuntu-corpus-1.0/ubuntu_dialogs.tgz (default = '.')
+- `--seed`: seed for random number generator (default = 1234)
+- `-o`, `--output`: output file for writing to csv (default = None)
+- `-t`, `--tokenize`: tokenize the output (`nltk.word_tokenize`)
 
 ####Subparsers:
-train: train set generator
--p: positive example probability, ie. the ratio of positive examples to total examples in the training set (default = 0.5)
--e, --examples: number of training examples to generate. Note that this will generate slightly fewer examples than desired, as there is 
-		a 'post-processing' step that filters  (default = 1000000)
+`train`: train set generator
+- `-p`: positive example probability, ie. the ratio of positive examples to total examples in the training set (default = 0.5)
+- `-e`, `--examples`: number of training examples to generate. Note that this will generate slightly fewer examples than desired, as there is a 'post-processing' step that filters  (default = 1000000)
 
-valid: validation set generator
--n: number of distractor examples for each context (default = 9)
+`valid`: validation set generator
+- `-n`: number of distractor examples for each context (default = 9)
 
-test: test set generator
--n: number of distractor examples for each context (default = 9)
+`test`: test set generator
+- `-n`: number of distractor examples for each context (default = 9)
 
 
 ###meta folder: trainfiles.csv, valfiles.csv, testfiles.csv:
