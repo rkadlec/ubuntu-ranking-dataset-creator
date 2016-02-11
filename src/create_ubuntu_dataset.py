@@ -1,5 +1,4 @@
 import argparse
-import cPickle as pickle
 import os
 import unicodecsv
 import random
@@ -11,7 +10,9 @@ __author__ = 'rkadlec'
 
 """
 Script for generation of train, test and valid datasets from Ubuntu Corpus 1 on 1 dialogs.
-Copyright IBM 2015
+Copyright IBM Corporation 2016
+LICENSE: Apache License 2.0  URL: ttp://www.apache.org/licenses/LICENSE-2.0
+Contact: Rudolf Kadlec (rudolf_kadlec@cz.ibm.com)
 """
 
 dialog_end_symbol = "__dialog_end__"
@@ -163,7 +164,7 @@ def create_single_dialog_train_example(context_dialog_path, candidate_dialog_pat
     return context_str, response, label
 
 
-def create_single_dialog_test_example(context_dialog_path, candidate_dialog_paths, rng, distractors_num):
+def create_single_dialog_test_example(context_dialog_path, candidate_dialog_paths, rng, distractors_num, max_context_length):
     """
     Creates a single example for testing or validation. Each line contains a context, one positive example and N negative examples.
     :param context_dialog_path:
@@ -175,7 +176,7 @@ def create_single_dialog_test_example(context_dialog_path, candidate_dialog_path
 
     dialog = translate_dialog_to_lists(context_dialog_path)
 
-    context_str, next_utterance_ix = create_random_context(dialog, rng)
+    context_str, next_utterance_ix = create_random_context(dialog, rng, max_context_length=max_context_length)
 
     # use the next utterance as positive example
     positive_response = singe_user_utterances_to_string(dialog[next_utterance_ix])
@@ -184,7 +185,7 @@ def create_single_dialog_test_example(context_dialog_path, candidate_dialog_path
     return context_str, positive_response, negative_responses
 
 
-def create_examples_train(candidate_dialog_paths, rng, positive_probability=0.5):
+def create_examples_train(candidate_dialog_paths, rng, positive_probability=0.5, max_context_length=20):
     """
     Creates single training example.
     :param candidate_dialog_paths:
@@ -198,11 +199,12 @@ def create_examples_train(candidate_dialog_paths, rng, positive_probability=0.5)
         if i % 1000 == 0:
             print str(i)
         dialog_path = candidate_dialog_paths[i]
-        examples.append(create_single_dialog_train_example(dialog_path, candidate_dialog_paths, rng, positive_probability))
+        examples.append(create_single_dialog_train_example(dialog_path, candidate_dialog_paths, rng, positive_probability,
+                                                           max_context_length=max_context_length))
         i+=1
     #return map(lambda dialog_path : create_single_dialog_train_example(dialog_path, candidate_dialog_paths, rng, positive_probability), candidate_dialog_paths)
 
-def create_examples(candidate_dialog_paths, creator_function):
+def create_examples(candidate_dialog_paths, examples_num, creator_function):
     """
     Creates a list of training examples from a list of dialogs and function that transforms a dialog to an example.
     :param candidate_dialog_paths:
@@ -211,7 +213,10 @@ def create_examples(candidate_dialog_paths, creator_function):
     """
     i = 0
     examples = []
-    for context_dialog in candidate_dialog_paths:
+    unique_dialogs_num = len(candidate_dialog_paths)
+
+    while i < examples_num:
+        context_dialog = candidate_dialog_paths[i % unique_dialogs_num]
         # counter for tracking progress
         if i % 1000 == 0:
             print str(i)
@@ -280,7 +285,10 @@ if __name__ == '__main__':
         dialog_paths = map(lambda path: os.path.join(args.data_root, "dialogs", path), convert_csv_with_dialog_paths(f))
 
         data_set = create_examples(dialog_paths,
-                                   lambda context_dialog, candidates : create_single_dialog_test_example(context_dialog, candidates, rng, args.n))
+                                   args.examples,
+                                   lambda context_dialog, candidates :
+                                   create_single_dialog_test_example(context_dialog, candidates, rng,
+                                                                     args.n, args.create_single_dialog_test_example))
         # output the dataset
         w = unicodecsv.writer(open(args.output, 'w'), encoding='utf-8')
         # header
@@ -302,9 +310,12 @@ if __name__ == '__main__':
 
         f = open(os.path.join("meta", "trainfiles.csv"), 'r')
         dialog_paths = map(lambda path: os.path.join(args.data_root, "dialogs", path), convert_csv_with_dialog_paths(f))
-        dialog_paths = dialog_paths[:args.examples]
 
-        train_set = create_examples(dialog_paths, lambda context_dialog, candidates : create_single_dialog_train_example(context_dialog, candidates, rng, args.p))
+        train_set = create_examples(dialog_paths,
+                                    args.examples,
+                                    lambda context_dialog, candidates :
+                                    create_single_dialog_train_example(context_dialog, candidates, rng,
+                                                                       args.p, max_context_length=args.max_context_length))
 
         # output the dataset
         w = unicodecsv.writer(open(args.output, 'w'), encoding='utf-8')
@@ -330,6 +341,9 @@ if __name__ == '__main__':
 
     parser.add_argument('--seed', type=int, default=1234,
                         help='seed for random number generator')
+
+    parser.add_argument('--max_context_length', type=int, default=20,
+                        help='maximum number of dialog turns in the context')
 
     parser.add_argument('-o', '--output', default=None,
                         help='output csv')
