@@ -322,7 +322,7 @@ if __name__ == '__main__':
                 tokenized_row = []
                 tokenized_row.append(" ".join(nltk.word_tokenize(row[0])))
                 tokenized_row.append(" ".join(nltk.word_tokenize(row[1])))
-                tokenized_row.append(row[2])
+                tokenized_row.append(int(float(row[2])))
             else:
                 tokenized_row = row
             w.writerow(tokenized_row)
