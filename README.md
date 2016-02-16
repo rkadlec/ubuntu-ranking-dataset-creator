@@ -14,8 +14,8 @@ There are several updates and bug fixes that are present in v2.0. The updates ar
 
 ###generate.sh:
 ####DESCRIPTION:
-Script that calls create_ubuntu_dataset.py 
-This is the script you should run to download the dataset
+Script that calls `create_ubuntu_dataset.py`
+This is the script you should run in order to download the dataset
 
 ###create_ubuntu_dataset.py:
 ####DESCRIPTION:
@@ -24,10 +24,14 @@ The script downloads 1on1 dialogs from internet and then it randomly samples all
 Copyright IBM 2015
 
 ####ARGUMENTS:
-- `--data_root`: directory where 1on1 dialogs will downloaded and extracted, the data will be downloaded from cs.mcgill.ca/~jpineau/datasets/ubuntu-corpus-1.0/ubuntu_dialogs.tgz (default = '.')
+- `--data_root`: directory where 1on1 dialogs will downloaded and extracted, the data will be downloaded from [cs.mcgill.ca/~jpineau/datasets/ubuntu-corpus-1.0/ubuntu_dialogs.tgz](cs.mcgill.ca/~jpineau/datasets/ubuntu-corpus-1.0/ubuntu_dialogs.tgz) (default = '.')
 - `--seed`: seed for random number generator (default = 1234)
 - `-o`, `--output`: output file for writing to csv (default = None)
 - `-t`, `--tokenize`: tokenize the output (`nltk.word_tokenize`)
+- `-s`, `--stem`: stem the output (`nltk.stem.SnowballStemmer`) - applied only when `-t` flag is present
+- `-l`, `--lemmatize`: lemmatize the output (`nltk.stem.WorldNetLemmatizer`) - applied only when `-t` flag is present
+
+*Note:* if both `-s` and `-l` are present, the stemmer is applied before the lemmatizer.
 
 ####Subparsers:
 `train`: train set generator
@@ -49,18 +53,11 @@ Maps the original dialogue files to the training, validation, and test sets.
 ##UBUNTU CORPUS FILES (after generating):
 
 ###train.csv:
-Contains the training set. It is separated into 3 columns: the context of the conversation, the candidate response or 'utterance', and a flag or 'label' (= 0 or 1) denoting 
-whether the response is a 'true response' to the context (flag = 1), or a randomly drawn response from elsewhere in the dataset (flag = 0). This
-triples format is described in the paper. When generated with the default settings, train.csv is 463Mb, with 898,143 lines (ie. examples, which corresponds to 449,071 dialogues)
-and with a vocabulary size of 1,344,621. Note that, to generate the full dataset, you should use the --examples argument for the create_ubuntu_dataset.py file.
+Contains the training set. It is separated into 3 columns: the context of the conversation, the candidate response or 'utterance', and a flag or 'label' (= 0 or 1) denoting whether the response is a 'true response' to the context (flag = 1), or a randomly drawn response from elsewhere in the dataset (flag = 0). This triples format is described in the paper. When generated with the default settings, train.csv is 463Mb, with 898,143 lines (ie. examples, which corresponds to 449,071 dialogues) and with a vocabulary size of 1,344,621. Note that, to generate the full dataset, you should use the `--examples` argument for the `create_ubuntu_dataset.py` file.
 
 ###valid.csv:
-Contains the validation set. Each row represents a question. Separated into 11 columns: the context, the true response or 'ground truth utterance', and 9 false responses or
-'distractors' that were randomly sampled from elsewhere in the dataset. Your model gets a question correct if it selects the ground truth utterance from amongst
-the 10 possible responses. When generated with the default settings, valid.csv is 27Mb, with 19,561 lines and a vocabulary size of 115,688.
+Contains the validation set. Each row represents a question. Separated into 11 columns: the context, the true response or 'ground truth utterance', and 9 false responses or 'distractors' that were randomly sampled from elsewhere in the dataset. Your model gets a question correct if it selects the ground truth utterance from amongst the 10 possible responses. When generated with the default settings, `valid.csv` is 27Mb, with 19,561 lines and a vocabulary size of 115,688.
 
 ###test.csv:
-Contains the test set. Formatted in the same way as the validation set. When generated with the default settings, test.csv is 27Mb, with 18,921 lines and a 
-vocabulary size of 115,623.
-
+Contains the test set. Formatted in the same way as the validation set. When generated with the default settings, test.csv is 27Mb, with 18,921 lines and a vocabulary size of 115,623.
 

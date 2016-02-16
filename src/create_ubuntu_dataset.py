@@ -6,7 +6,9 @@ import random
 from six.moves import urllib
 import tarfile
 import csv
+
 import nltk
+from nltk.stem import SnowballStemmer, WordNetLemmatizer
 
 __author__ = 'rkadlec'
 
@@ -260,12 +262,7 @@ def prepare_data_maybe_download(directory):
                 tar.extractall(path=directory)
           print("Archive unpacked.")
 
-
     return
-
-
-
-
 
 #####################################################################################
 # Command line script related code
@@ -289,15 +286,22 @@ if __name__ == '__main__':
         header.extend(map(lambda x: "Distractor_{}".format(x), xrange(args.n)))
         w.writerow(header)
 
+        stemmer = SnowballStemmer("english")
+        lemmatizer = WordNetLemmatizer()
+
         for row in data_set:
+            translated_row = [row[0], row[1]]
+            translated_row.extend(row[2])
+            
             if args.tokenize:
-                translated_row = ["", ""]
-                translated_row[0] = " ".join(nltk.word_tokenize(row[0]))
-                translated_row[1] = " ".join(nltk.word_tokenize(row[1]))
-                translated_row.extend(map(lambda x: " ".join(nltk.word_tokenize(x)), row[2]))
-            else:
-                translated_row = [row[0], row[1]]
-                translated_row.extend(row[2])
+                translated_row = map(nltk.word_tokenize, translated_row)
+                if args.stem:
+                    translated_row = map(lambda sub: map(stemmer.stem, sub), translated_row)
+                if args.lemmatize:
+                    translated_row = map(lambda sub: map(lambda tok: lemmatizer.lemmatize(tok, pos='v'), sub), translated_row)
+                    
+                translated_row = map(lambda x: " ".join(x), translated_row)
+
             w.writerow(translated_row)
         print("Dataset stored in: {}".format(args.output))
 
@@ -313,20 +317,29 @@ if __name__ == '__main__':
 
         train_set = create_examples(dialog_paths, lambda context_dialog, candidates : create_single_dialog_train_example(context_dialog, candidates, rng, args.p))
 
+        stemmer = SnowballStemmer("english")
+        lemmatizer = WordNetLemmatizer()
+
         # output the dataset
         w = unicodecsv.writer(open(args.output, 'w'), encoding='utf-8')
         # header
         w.writerow(["Context", "Utterance", "Label"])
         for row in train_set:
+            translated_row = row
+
             if args.tokenize:
-                tokenized_row = []
-                tokenized_row.append(" ".join(nltk.word_tokenize(row[0])))
-                tokenized_row.append(" ".join(nltk.word_tokenize(row[1])))
-                tokenized_row.append(int(float(row[2])))
-            else:
-                tokenized_row = row
-            w.writerow(tokenized_row)
-        print("Train data stored in: {}".format(args.output))
+                translated_row = [nltk.word_tokenize(row[i]) for i in [0,1]]
+
+                if args.stem:
+                    translated_row = map(lambda sub: map(stemmer.stem, sub), translated_row)
+                if args.lemmatize:
+                    translated_row = map(lambda sub: map(lambda tok: lemmatizer.lemmatize(tok, pos='v'), sub), translated_row)
+
+                translated_row = map(lambda x: " ".join(x), translated_row)
+                translated_row.append(int(float(row[2])))
+
+            w.writerow(translated_row)
+        print("Train dataset stored in: {}".format(args.output))
 
     def valid_cmd(args):
         create_eval_dataset(args, "valfiles.csv")
@@ -351,6 +364,12 @@ if __name__ == '__main__':
     parser.add_argument('-t', '--tokenize', action='store_true',
                         help='tokenize the output')
 
+    parser.add_argument('-l', '--lemmatize', action='store_true',
+                        help='lemmatize the output by nltk.stem.WorldNetLemmatizer (applied only when -t flag is present)')
+
+    parser.add_argument('-s', '--stem', action='store_true',
+                        help='stem the output by nltk.stem.SnowballStemmer (applied only when -t flag is present)')
+
     subparsers = parser.add_subparsers(help='sub-command help')
 
     parser_train = subparsers.add_parser('train', help='trainset generator')
@@ -373,12 +392,4 @@ if __name__ == '__main__':
 
     # create dataset
     args.func(args)
-
-
-
-
-
-
-
-
 
