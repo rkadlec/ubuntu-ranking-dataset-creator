@@ -285,10 +285,9 @@ if __name__ == '__main__':
         dialog_paths = map(lambda path: os.path.join(args.data_root, "dialogs", path), convert_csv_with_dialog_paths(f))
 
         data_set = create_examples(dialog_paths,
-                                   args.examples,
-                                   lambda context_dialog, candidates :
-                                   create_single_dialog_test_example(context_dialog, candidates, rng,
-                                                                     args.n, args.create_single_dialog_test_example))
+                                   len(dialog_paths),
+                                   lambda context_dialog, candidates : create_single_dialog_test_example(context_dialog, candidates, rng,
+                                                                     args.n, args.max_context_length))
         # output the dataset
         w = unicodecsv.writer(open(args.output, 'w'), encoding='utf-8')
         # header
@@ -337,7 +336,7 @@ if __name__ == '__main__':
                                                  "The script downloads 1on1 dialogs from internet and then it randomly samples all the datasets with positive and negative examples.")
 
     parser.add_argument('--data_root', default='.',
-                        help='directory where 1on1 dialogs will downloaded and extracted, the data will be downloaded from cs.mcgill.ca/~jpineau/datasets/ubuntu-corpus-1.0/ubuntu_dialogs.tgz')
+                        help='directory where 1on1 dialogs will be downloaded and extracted, the data will be downloaded from cs.mcgill.ca/~jpineau/datasets/ubuntu-corpus-1.0/ubuntu_dialogs.tgz')
 
     parser.add_argument('--seed', type=int, default=1234,
                         help='seed for random number generator')
