@@ -16,6 +16,13 @@ real life implementation, where you are training a model on past data to predict
 (between 2 and the max context size). This increases the average context length, which we consider desirable since we would like to
 model long-term dependencies.
 
+-Changed the tokenization and entity replacement procedure. After complaints stating v1 was too aggressive, we've decided to remove these.
+It is up to each person using the dataset to come up with their own tokenization/ entity replacement scheme. We plan to use twokenize internally.
+
+-Added differentiation between the end of an utterance (__eou__) and end of turn (__eot__). In the original dataset, we concatenated all consecutive
+utterances by the same user in to one utterance, and put __EOS__ at the end. Here, we also denote where the original utterances were (with __eou__). Also, the
+terminology should now be consistent between the training and test set (instead of both __EOS__ and </s>).
+
 -Fixed a bug that caused the distribution of false responses in the test and validation sets to be different from the true responses.
 In particular, the number of words in the false responses was shorter on average than for the true responses, which could have been
 exploited by some models.
@@ -74,5 +81,96 @@ the 10 possible responses. When generated with the default settings, valid.csv i
 ###test.csv:
 Contains the test set. Formatted in the same way as the validation set. When generated with the default settings, test.csv is 27Mb, with 18,921 lines and a 
 vocabulary size of 115,623.
+
+
+##BASELINE RESULTS
+
+####Dual Encoder LSTM model:
+1 in 2:
+	recall@1: 0.868730970907
+1 in 10:
+	recall@1: 0.552213717862 
+	recall@2: 0.72099120433, 
+	recall@5: 0.924285351827 
+
+####Dual Encoder RNN model:
+1 in 2:
+	recall@1: 0.776539210705,
+1 in 10:
+	recall@1: 0.379139142954, 
+	recall@2: 0.560689786585, 
+	recall@5: 0.836350355691,
+
+####TF-IDF model:
+1 in 2:
+	recall@1:  0.749260042283
+1 in 10:
+	recall@1:  0.48810782241
+	recall@2:  0.587315010571
+	recall@5:  0.763054968288
+
+
+##HYPERPARAMETERS USED
+
+Code for the model can be found here (might not be up to date with the new dataset): https://github.com/npow/ubottu
+
+####Dual Encoder LSTM model:
+
+act_penalty=500
+batch_size=256
+conv_attn=False 
+corr_penalty=0.0
+emb_penalty=0.001
+fine_tune_M=True
+fine_tune_W=False
+forget_gate_bias=2.0
+hidden_size=200
+is_bidirectional=False
+lr=0.001
+lr_decay=0.95
+max_seqlen=160
+n_epochs=100
+n_recurrent_layers=1
+optimizer='adam'
+penalize_activations=False
+penalize_emb_drift=False
+penalize_emb_norm=False
+pv_ndims=100
+seed=42
+shuffle_batch=False
+sort_by_len=False
+sqr_norm_lim=1
+use_pv=False
+xcov_penalty=0.0
+
+####Dual Encoder RNN model:
+
+act_penalty=500
+batch_size=512
+conv_attn=False
+corr_penalty=0.0
+emb_penalty=0.001
+fine_tune_M=False
+fine_tune_W=False
+forget_gate_bias=2.0
+hidden_size=100
+is_bidirectional=False
+lr=0.0001
+lr_decay=0.95
+max_seqlen=160
+n_epochs=100
+n_recurrent_layers=1
+optimizer='adam'
+penalize_activations=False
+penalize_emb_drift=False
+penalize_emb_norm=False
+pv_ndims=100
+seed=42
+shuffle_batch=False
+sort_by_len=False
+sqr_norm_lim=1
+use_pv=False
+xcov_penalty=0.0
+
 
 
