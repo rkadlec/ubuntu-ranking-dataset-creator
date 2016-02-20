@@ -5,6 +5,7 @@ import random
 from six.moves import urllib
 import tarfile
 import csv
+import nltk
 
 __author__ = 'rkadlec'
 
@@ -296,8 +297,14 @@ if __name__ == '__main__':
         w.writerow(header)
 
         for row in data_set:
-            translated_row = [row[0], row[1]]
-            translated_row.extend(row[2])
+            if args.tokenize:
+                translated_row = ["", ""]
+                translated_row[0] = " ".join(nltk.word_tokenize(row[0]))
+                translated_row[1] = " ".join(nltk.word_tokenize(row[1]))
+                translated_row.extend(map(lambda x: " ".join(nltk.word_tokenize(x)), row[2]))
+            else:
+                translated_row = [row[0], row[1]]
+                translated_row.extend(row[2])
             w.writerow(translated_row)
         print("Dataset stored in: {}".format(args.output))
 
@@ -321,7 +328,14 @@ if __name__ == '__main__':
         # header
         w.writerow(["Context", "Utterance", "Label"])
         for row in train_set:
-            w.writerow(row)
+            if args.tokenize:
+                tokenized_row = []
+                tokenized_row.append(" ".join(nltk.word_tokenize(row[0])))
+                tokenized_row.append(" ".join(nltk.word_tokenize(row[1])))
+                tokenized_row.append(int(float(row[2])))
+            else:
+                tokenized_row = row
+            w.writerow(tokenized_row)
         print("Train data stored in: {}".format(args.output))
 
     def valid_cmd(args):
@@ -346,6 +360,9 @@ if __name__ == '__main__':
 
     parser.add_argument('-o', '--output', default=None,
                         help='output csv')
+
+    parser.add_argument('-t', '--tokenize', action='store_true',
+                        help='tokenize the output')
 
     subparsers = parser.add_subparsers(help='sub-command help')
 
