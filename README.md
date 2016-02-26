@@ -54,7 +54,7 @@ Maps the original dialogue files to the training, validation, and test sets.
 ##UBUNTU CORPUS FILES (after generating):
 
 ###train.csv:
-Contains the training set. It is separated into 3 columns: the context of the conversation, the candidate response or 'utterance', and a flag or 'label' (= 0 or 1) denoting whether the response is a 'true response' to the context (flag = 1), or a randomly drawn response from elsewhere in the dataset (flag = 0). This triples format is described in the paper. When generated with the default settings, train.csv is 463Mb, with 1,000,000 lines (ie. examples, which corresponds to 449,071 dialogues) and with a vocabulary size of 1,344,621. Note that, to generate the full dataset, you should use the `--examples` argument for the `create_ubuntu_dataset.py` file.
+Contains the training set. It is separated into 3 columns: the context of the conversation, the candidate response or 'utterance', and a flag or 'label' (= 0 or 1) denoting whether the response is a 'true response' to the context (flag = 1), or a randomly drawn response from elsewhere in the dataset (flag = 0). This triples format is described in the paper. When generated with the default settings, train.csv is 463Mb, with 1,000,000 lines (ie. examples, which corresponds to 449,071 dialogues) and with a vocabulary size of ~~1,344,621~~. Note that, to generate the full dataset, you should use the `--examples` argument for the `create_ubuntu_dataset.py` file.
 
 ###valid.csv:
 Contains the validation set. Each row represents a question. Separated into 11 columns: the context, the true response or 'ground truth utterance', and 9 false responses or 'distractors' that were randomly sampled from elsewhere in the dataset. Your model gets a question correct if it selects the ground truth utterance from amongst the 10 possible responses. When generated with the default settings, `valid.csv` is 27Mb, with 19,561 lines and a vocabulary size of 115,688.
@@ -65,36 +65,41 @@ Contains the test set. Formatted in the same way as the validation set. When gen
 ##BASELINE RESULTS
 
 ####Dual Encoder LSTM model:
+```
 1 in 2:
 	recall@1: 0.868730970907
 1 in 10:
 	recall@1: 0.552213717862 
 	recall@2: 0.72099120433, 
 	recall@5: 0.924285351827 
+```
 
 ####Dual Encoder RNN model:
+```
 1 in 2:
 	recall@1: 0.776539210705,
 1 in 10:
 	recall@1: 0.379139142954, 
 	recall@2: 0.560689786585, 
 	recall@5: 0.836350355691,
+```
 
 ####TF-IDF model:
+```
 1 in 2:
 	recall@1:  0.749260042283
 1 in 10:
 	recall@1:  0.48810782241
 	recall@2:  0.587315010571
 	recall@5:  0.763054968288
-
+```
 
 ##HYPERPARAMETERS USED
 
 Code for the model can be found here (might not be up to date with the new dataset): https://github.com/npow/ubottu
 
 ####Dual Encoder LSTM model:
-
+```
 act_penalty=500
 batch_size=256
 conv_attn=False 
@@ -121,9 +126,10 @@ sort_by_len=False
 sqr_norm_lim=1
 use_pv=False
 xcov_penalty=0.0
+```
 
 ####Dual Encoder RNN model:
-
+```
 act_penalty=500
 batch_size=512
 conv_attn=False
@@ -150,4 +156,4 @@ sort_by_len=False
 sqr_norm_lim=1
 use_pv=False
 xcov_penalty=0.0
-
+```
