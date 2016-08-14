@@ -25,7 +25,7 @@ The script downloads 1on1 dialogs from internet and then it randomly samples all
 Copyright IBM 2015
 
 ####ARGUMENTS:
-- `--data_root`: directory where 1on1 dialogs will downloaded and extracted, the data will be downloaded from [cs.mcgill.ca/~jpineau/datasets/ubuntu-corpus-1.0/ubuntu_dialogs.tgz](cs.mcgill.ca/~jpineau/datasets/ubuntu-corpus-1.0/ubuntu_dialogs.tgz) (default = '.')
+- `--data_root`: directory where 1on1 dialogs will downloaded and extracted, the data will be downloaded from [cs.mcgill.ca/~jpineau/datasets/ubuntu-corpus-1.0/ubuntu_dialogs.tgz](http://cs.mcgill.ca/~jpineau/datasets/ubuntu-corpus-1.0/ubuntu_dialogs.tgz) (default = '.')
 - `--seed`: seed for random number generator (default = 1234)
 - `-o`, `--output`: output file for writing to csv (default = None)
 - `-t`, `--tokenize`: tokenize the output (`nltk.word_tokenize`)
