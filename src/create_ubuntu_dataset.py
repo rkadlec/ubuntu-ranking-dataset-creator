@@ -251,7 +251,7 @@ def prepare_data_maybe_download(directory):
   dialogs_path = os.path.join(directory, 'dialogs')
 
   # test it there are some dialogs in the path
-  if not os.path.exists(os.path.join(directory,"10","1.tst")):
+  if not os.path.exists(os.path.join(dialogs_path,"10","1.tsv")):
     # dialogs are missing
     archive_path = os.path.join(directory,filename)
     if not os.path.exists(archive_path):
@@ -259,7 +259,9 @@ def prepare_data_maybe_download(directory):
         print("Downloading %s to %s" % (url, archive_path))
         filepath, _ = urllib.request.urlretrieve(url, archive_path)
         print "Successfully downloaded " + filepath
-
+  else:
+    print("Found existing dataset at %s" % dialogs_path)
+    
     # unpack data
     if not os.path.exists(dialogs_path):
           print("Unpacking dialogs ...")
